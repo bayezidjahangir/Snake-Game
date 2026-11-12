@@ -1,0 +1,227 @@
+<!>DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake Game</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #101820;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    color: #00ff88;
+}
+
+.score {
+    font-size: 22px;
+    margin: 15px;
+}
+
+canvas {
+    display: block;
+    width: 400px;
+    max-width: 90vw;
+    height: auto;
+    background: #050505;
+    border: 3px solid #00ff88;
+    border-radius: 8px;
+    outline: none;
+}
+
+button {
+    margin: 15px 5px;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 7px;
+    background: #00ff88;
+    color: #101820;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: white;
+}
+
+p {
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🐍 Snake Game</h1>
+
+    <div class="score">
+        Score: <span id="score">0</span>
+    </div>
+
+    <canvas id="game" width="400" height="400" tabindex="0"></canvas>
+
+    <button onclick="startGame()">Start Game</button>
+
+    <p>Use Arrow Keys to move the Snake</p>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const scoreText = document.getElementById("score");
+
+const size = 20;
+const total = 400;
+
+let snake;
+let food;
+let dx;
+let dy;
+let score;
+let timer = null;
+let running = false;
+
+function randomFood() {
+    let position;
+
+    do {
+        position = {
+            x: Math.floor(Math.random() * 20) * size,
+            y: Math.floor(Math.random() * 20) * size
+        };
+    } while (snake.some(part =>
+        part.x === position.x && part.y === position.y
+    ));
+
+    return position;
+}
+
+function draw() {
+    ctx.fillStyle = "#050505";
+    ctx.fillRect(0, 0, total, total);
+
+    // Food
+    ctx.fillStyle = "#ff3030";
+    ctx.beginPath();
+    ctx.arc(food.x + 10, food.y + 10, 9, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Snake
+    snake.forEach((part, index) => {
+        ctx.fillStyle = index === 0 ? "#00ff88" : "#00b86b";
+        ctx.fillRect(part.x + 1, part.y + 1, 18, 18);
+    });
+}
+
+function update() {
+    const head = {
+        x: snake[0].x + dx,
+        y: snake[0].y + dy
+    };
+
+    const eating = head.x === food.x && head.y === food.y;
+
+    if (
+        head.x < 0 || head.x >= total ||
+        head.y < 0 || head.y >= total ||
+        snake.slice(0, eating ? snake.length : -1).some(part =>
+            part.x === head.x && part.y === head.y
+        )
+    ) {
+        endGame();
+        return;
+    }
+
+    snake.unshift(head);
+
+    if (eating) {
+        score++;
+        scoreText.textContent = score;
+        food = randomFood();
+    } else {
+        snake.pop();
+    }
+
+    draw();
+}
+
+function startGame() {
+    clearInterval(timer);
+
+    snake = [{ x: 200, y: 200 }];
+    dx = size;
+    dy = 0;
+    score = 0;
+
+    scoreText.textContent = score;
+    food = randomFood();
+
+    running = true;
+    draw();
+
+    canvas.focus();
+    timer = setInterval(update, 120);
+}
+
+function endGame() {
+    clearInterval(timer);
+    running = false;
+    alert("Game Over! Your Score: " + score);
+}
+
+function changeDirection(e) {
+    const key = e.key;
+
+    if (
+        ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(key)
+    ) {
+        e.preventDefault();
+    }
+
+    if (key === "ArrowUp" && dy === 0) {
+        dx = 0;
+        dy = -size;
+    } else if (key === "ArrowDown" && dy === 0) {
+        dx = 0;
+        dy = size;
+    } else if (key === "ArrowLeft" && dx === 0) {
+        dx = -size;
+        dy = 0;
+    } else if (key === "ArrowRight" && dx === 0) {
+        dx = size;
+        dy = 0;
+    }
+}
+
+document.addEventListener("keydown", changeDirection);
+
+snake = [{ x: 200, y: 200 }];
+dx = size;
+dy = 0;
+score = 0;
+food = { x: 100, y: 100 };
+
+draw();
+</script>
+
+</body>
+</html>
