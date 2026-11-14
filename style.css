@@ -1,0 +1,26 @@
+.stats {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat {
+    flex: 1;
+    padding: 15px;
+    background: #182720;
+    border: 1px solid #39ff88;
+    border-radius: 12px;
+}
+
+.stat span {
+    color: #9aaea1;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.stat strong {
+    display: block;
+    color: #39ff88;
+    font-size: 28px;
+    margin-top: 6px;
+}

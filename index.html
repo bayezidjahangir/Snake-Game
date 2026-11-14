@@ -1,681 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake Game</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      color: #eaf2ff;
-      background:
-        radial-gradient(circle at top, #173b50, #07111d 65%);
-    }
-
-    .game-container {
-      width: 100%;
-      max-width: 480px;
-      padding: 24px;
-      border: 1px solid #29465a;
-      border-radius: 22px;
-      background: rgba(10, 25, 39, 0.96);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-      text-align: center;
-    }
-
-    h1 {
-      margin-bottom: 8px;
-      color: #53f5a2;
-      letter-spacing: 3px;
-      font-size: 30px;
-    }
-
-    .subtitle {
-      color: #91a9bb;
-      font-size: 13px;
-      margin-bottom: 22px;
-    }
-
-    .stats {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .stat-box {
-      flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      background: #132b3d;
-      border: 1px solid #29465a;
-    }
-
-    .stat-box span {
-      display: block;
-      color: #91a9bb;
-      font-size: 12px;
-      margin-bottom: 5px;
-    }
-
-    .stat-box strong {
-      color: #53f5a2;
-      font-size: 23px;
-    }
-
-    .canvas-wrap {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      border: 3px solid #31556a;
-      border-radius: 13px;
-      background: #071522;
-      box-shadow: 0 0 22px rgba(46, 240, 151, 0.1);
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: auto;
-      aspect-ratio: 1;
-    }
-
-    .status {
-      min-height: 24px;
-      margin: 14px 0;
-      color: #a8c4d5;
-      font-size: 14px;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 10px;
-    }
-
-    button {
-      flex: 1;
-      padding: 13px 8px;
-      border: none;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      filter: brightness(1.15);
-    }
-
-    button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    #startBtn {
-      color: #061b13;
-      background: #53f5a2;
-    }
-
-    #pauseBtn {
-      color: white;
-      background: #27617b;
-    }
-
-    #restartBtn {
-      color: white;
-      background: #a94b55;
-    }
-
-    .controls {
-      width: 180px;
-      margin: 20px auto 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 7px;
-    }
-
-    .controls button {
-      min-height: 43px;
-      color: white;
-      background: #1b394e;
-      border: 1px solid #34566b;
-      font-size: 20px;
-      touch-action: manipulation;
-    }
-
-    .empty {
-      visibility: hidden;
-    }
-
-    .hint {
-      margin-top: 18px;
-      color: #7893a5;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 420px) {
-      .game-container {
-        padding: 15px;
-      }
-
-      h1 {
-        font-size: 25px;
-      }
-
-      button {
-        font-size: 11px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Arcade</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-  <main class="game-container">
-    <h1>SNAKE GAME</h1>
-    <p class="subtitle">Classic arcade • Enhanced edition</p>
+<div class="game-container">
 
-    <section class="stats">
-      <div class="stat-box">
-        <span>SCORE</span>
-        <strong id="score">0</strong>
-      </div>
+    <header>
+        <h1>🐍 SNAKE ARCADE</h1>
+        <p>Classic Game • Premium Edition</p>
+    </header>
 
-      <div class="stat-box">
-        <span>BEST</span>
-        <strong id="best">0</strong>
-      </div>
-    </section>
+    <!-- Scoreboard -->
+    <div class="stats">
+        <div class="stat">
+            <span>YOUR SCORE</span>
+            <strong id="score">0</strong>
+        </div>
 
-    <div class="canvas-wrap">
-      <canvas id="game" width="420" height="420"></canvas>
+        <div class="stat">
+            <span>HIGH SCORE</span>
+            <strong id="best">0</strong>
+        </div>
     </div>
 
-    <p class="status" id="status">
-      Press START GAME to begin
+    <!-- Settings -->
+    <div class="settings">
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty">
+            <option value="150">Easy</option>
+            <option value="105" selected>Normal</option>
+            <option value="65">Hard</option>
+        </select>
+
+        <label for="theme">Theme</label>
+        <select id="theme">
+            <option value="green">Neon Green</option>
+            <option value="blue">Cyber Blue</option>
+            <option value="red">Neon Red</option>
+        </select>
+    </div>
+
+    <!-- Game Board -->
+    <div class="board-wrapper">
+        <canvas id="game" width="400" height="400"></canvas>
+
+        <div id="overlay" class="overlay">
+            <h2 id="overlayTitle">READY?</h2>
+            <p id="overlayText">Press Start to Play</p>
+            <button id="startBtn">START GAME</button>
+        </div>
+    </div>
+
+    <!-- Game Buttons -->
+    <div class="game-buttons">
+        <button id="pauseBtn">PAUSE</button>
+        <button id="restartBtn">RESTART</button>
+        <button id="soundBtn">SOUND: ON</button>
+    </div>
+
+    <!-- Mobile Controls -->
+    <div class="mobile-controls">
+        <button data-dir="up">▲</button>
+
+        <div>
+            <button data-dir="left">◀</button>
+            <button data-dir="down">▼</button>
+            <button data-dir="right">▶</button>
+        </div>
+    </div>
+
+    <p class="instructions">
+        Use Arrow Keys or WASD to move.
+        Collect food and avoid collisions!
     </p>
 
-    <div class="buttons">
-      <button id="startBtn">START GAME</button>
-      <button id="pauseBtn" disabled>PAUSE</button>
-      <button id="restartBtn">RESTART</button>
-    </div>
+</div>
 
-    <div class="controls">
-      <button class="empty" tabindex="-1"></button>
-      <button data-dir="up">▲</button>
-      <button class="empty" tabindex="-1"></button>
-
-      <button data-dir="left">◀</button>
-      <button data-dir="down">▼</button>
-      <button data-dir="right">▶</button>
-    </div>
-
-    <p class="hint">
-      Use Arrow Keys or WASD to move<br>
-      Avoid walls and don't hit yourself!
-    </p>
-  </main>
-
-  <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-
-    const scoreEl = document.getElementById("score");
-    const bestEl = document.getElementById("best");
-    const statusEl = document.getElementById("status");
-
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const restartBtn = document.getElementById("restartBtn");
-
-    const CELL = 20;
-    const GRID = canvas.width / CELL;
-
-    const DIRECTIONS = {
-      up:    { x: 0, y: -1 },
-      down:  { x: 0, y: 1 },
-      left:  { x: -1, y: 0 },
-      right: { x: 1, y: 0 }
-    };
-
-    let snake;
-    let food;
-    let direction;
-    let nextDirection;
-
-    let score = 0;
-    let best = loadBest();
-
-    let running = false;
-    let paused = false;
-    let gameOver = false;
-    let hasStarted = false;
-
-    let lastTime = 0;
-    let accumulator = 0;
-
-    bestEl.textContent = best;
-
-    function loadBest() {
-      try {
-        return Number(localStorage.getItem("snakeBest")) || 0;
-      } catch {
-        return 0;
-      }
-    }
-
-    function saveBest() {
-      try {
-        localStorage.setItem("snakeBest", best);
-      } catch {
-        // Game can continue if storage is unavailable.
-      }
-    }
-
-    function resetGame() {
-      snake = [
-        { x: 10, y: 10 },
-        { x: 9, y: 10 },
-        { x: 8, y: 10 }
-      ];
-
-      direction = DIRECTIONS.right;
-      nextDirection = direction;
-
-      score = 0;
-      scoreEl.textContent = score;
-
-      food = createFood();
-
-      accumulator = 0;
-      gameOver = false;
-      paused = false;
-    }
-
-    function createFood() {
-      const emptyCells = [];
-
-      for (let y = 0; y < GRID; y++) {
-        for (let x = 0; x < GRID; x++) {
-          const occupied = snake.some(
-            part => part.x === x && part.y === y
-          );
-
-          if (!occupied) {
-            emptyCells.push({ x, y });
-          }
-        }
-      }
-
-      if (emptyCells.length === 0) return null;
-
-      return emptyCells[
-        Math.floor(Math.random() * emptyCells.length)
-      ];
-    }
-
-    function changeDirection(newDirection) {
-      if (
-        newDirection.x === -direction.x &&
-        newDirection.y === -direction.y
-      ) {
-        return;
-      }
-
-      nextDirection = newDirection;
-    }
-
-    function handleKeyDown(event) {
-      const key = event.key.toLowerCase();
-
-      const controls = {
-        arrowup: "up",
-        w: "up",
-        arrowdown: "down",
-        s: "down",
-        arrowleft: "left",
-        a: "left",
-        arrowright: "right",
-        d: "right"
-      };
-
-      if (controls[key]) {
-        event.preventDefault();
-        changeDirection(DIRECTIONS[controls[key]]);
-      }
-
-      if (key === " " || key === "p") {
-        event.preventDefault();
-        togglePause();
-      }
-
-      if (key === "enter" && (!hasStarted || gameOver)) {
-        startGame();
-      }
-    }
-
-    function update() {
-      direction = nextDirection;
-
-      const head = {
-        x: snake[0].x + direction.x,
-        y: snake[0].y + direction.y
-      };
-
-      const eating =
-        food && head.x === food.x && head.y === food.y;
-
-      // Check wall collision.
-      if (
-        head.x < 0 ||
-        head.y < 0 ||
-        head.x >= GRID ||
-        head.y >= GRID
-      ) {
-        endGame();
-        return;
-      }
-
-      // The tail moves away unless the snake eats food.
-      const body = eating ? snake : snake.slice(0, -1);
-
-      const hitSelf = body.some(
-        part => part.x === head.x && part.y === head.y
-      );
-
-      if (hitSelf) {
-        endGame();
-        return;
-      }
-
-      snake.unshift(head);
-
-      if (eating) {
-        score += 10;
-        scoreEl.textContent = score;
-
-        if (score > best) {
-          best = score;
-          bestEl.textContent = best;
-          saveBest();
-        }
-
-        food = createFood();
-
-        if (!food) {
-          endGame("You Win!");
-          return;
-        }
-      } else {
-        snake.pop();
-      }
-    }
-
-    function endGame(message = "Game Over!") {
-      running = false;
-      paused = false;
-      gameOver = true;
-
-      statusEl.textContent = message + " Score: " + score;
-      updateButtons();
-    }
-
-    function updateButtons() {
-      startBtn.textContent =
-        gameOver ? "PLAY AGAIN" :
-        paused ? "RESUME" :
-        running ? "RUNNING" : "START GAME";
-
-      startBtn.disabled = running && !paused;
-
-      pauseBtn.disabled = !hasStarted || gameOver;
-      pauseBtn.textContent = paused ? "RESUME" : "PAUSE";
-    }
-
-    function startGame() {
-      if (running && !paused) return;
-
-      if (!hasStarted || gameOver) {
-        resetGame();
-      }
-
-      hasStarted = true;
-      running = true;
-      paused = false;
-
-      statusEl.textContent = "Game running...";
-      updateButtons();
-    }
-
-    function togglePause() {
-      if (!hasStarted || gameOver || !running) return;
-
-      paused = !paused;
-
-      statusEl.textContent = paused
-        ? "Game paused"
-        : "Game running...";
-
-      updateButtons();
-    }
-
-    function restartGame() {
-      resetGame();
-
-      hasStarted = true;
-      running = true;
-      paused = false;
-
-      statusEl.textContent = "New game started!";
-      updateButtons();
-    }
-
-    function drawBackground() {
-      ctx.fillStyle = "#071522";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Subtle grid.
-      ctx.strokeStyle = "rgba(100, 160, 180, 0.07)";
-      ctx.lineWidth = 1;
-
-      for (let i = 0; i <= GRID; i++) {
-        const position = i * CELL;
-
-        ctx.beginPath();
-        ctx.moveTo(position, 0);
-        ctx.lineTo(position, canvas.height);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(0, position);
-        ctx.lineTo(canvas.width, position);
-        ctx.stroke();
-      }
-    }
-
-    function drawFood() {
-      if (!food) return;
-
-      const x = food.x * CELL + CELL / 2;
-      const y = food.y * CELL + CELL / 2;
-
-      ctx.save();
-
-      ctx.shadowColor = "#ff5268";
-      ctx.shadowBlur = 14;
-
-      const gradient = ctx.createRadialGradient(
-        x - 3, y - 4, 2,
-        x, y, 10
-      );
-
-      gradient.addColorStop(0, "#ffb1a9");
-      gradient.addColorStop(1, "#ef354f");
-
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(x, y, 8, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.shadowBlur = 0;
-
-      ctx.fillStyle = "#53f5a2";
-      ctx.beginPath();
-      ctx.ellipse(x + 5, y - 9, 4, 2, -0.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-    }
-
-    function drawSnake() {
-      snake.forEach((part, index) => {
-        const x = part.x * CELL;
-        const y = part.y * CELL;
-
-        const gradient = ctx.createLinearGradient(
-          x, y, x + CELL, y + CELL
-        );
-
-        if (index === 0) {
-          gradient.addColorStop(0, "#a5ffd0");
-          gradient.addColorStop(1, "#20c878");
-        } else {
-          gradient.addColorStop(0, "#45e99a");
-          gradient.addColorStop(1, "#138b59");
-        }
-
-        ctx.fillStyle = gradient;
-
-        ctx.beginPath();
-        ctx.roundRect(
-          x + 2, y + 2,
-          CELL - 4, CELL - 4,
-          index === 0 ? 7 : 5
-        );
-        ctx.fill();
-
-        if (index === 0) {
-          drawEyes(x, y);
-        }
-      });
-    }
-
-    function drawEyes(x, y) {
-      let eye1, eye2;
-
-      if (direction.x === 1) {
-        eye1 = [x + 14, y + 6];
-        eye2 = [x + 14, y + 13];
-      } else if (direction.x === -1) {
-        eye1 = [x + 6, y + 6];
-        eye2 = [x + 6, y + 13];
-      } else if (direction.y === -1) {
-        eye1 = [x + 6, y + 6];
-        eye2 = [x + 13, y + 6];
-      } else {
-        eye1 = [x + 6, y + 14];
-        eye2 = [x + 13, y + 14];
-      }
-
-      ctx.fillStyle = "#06251b";
-
-      [eye1, eye2].forEach(eye => {
-        ctx.beginPath();
-        ctx.arc(eye[0], eye[1], 2, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-
-    function drawOverlay(title, subtitle) {
-      ctx.fillStyle = "rgba(3, 12, 20, 0.76)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.textAlign = "center";
-
-      ctx.fillStyle = "#53f5a2";
-      ctx.font = "bold 32px Arial";
-      ctx.fillText(title, canvas.width / 2, 190);
-
-      ctx.fillStyle = "#d0e3ed";
-      ctx.font = "15px Arial";
-      ctx.fillText(subtitle, canvas.width / 2, 225);
-
-      ctx.textAlign = "start";
-    }
-
-    function draw() {
-      drawBackground();
-      drawFood();
-      drawSnake();
-
-      if (!hasStarted) {
-        drawOverlay("SNAKE GAME", "Press START GAME");
-      } else if (gameOver) {
-        drawOverlay("GAME OVER", "Press PLAY AGAIN");
-      } else if (paused) {
-        drawOverlay("PAUSED", "Press RESUME");
-      }
-    }
-
-    function gameLoop(timestamp) {
-      if (!lastTime) lastTime = timestamp;
-
-      const delta = Math.min(timestamp - lastTime, 100);
-      lastTime = timestamp;
-
-      if (running && !paused) {
-        accumulator += delta;
-
-        const speed = Math.max(
-          65,
-          125 - Math.floor(score / 50) * 5
-        );
-
-        while (accumulator >= speed) {
-          update();
-          accumulator -= speed;
-
-          if (!running) break;
-        }
-      }
-
-      draw();
-      requestAnimationFrame(gameLoop);
-    }
-
-    startBtn.addEventListener("click", startGame);
-    pauseBtn.addEventListener("click", togglePause);
-    restartBtn.addEventListener("click", restartGame);
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    document.querySelectorAll("[data-dir]").forEach(button => {
-      button.addEventListener("pointerdown", event => {
-        event.preventDefault();
-        changeDirection(DIRECTIONS[button.dataset.dir]);
-      });
-    });
-
-    resetGame();
-    updateButtons();
-    requestAnimationFrame(gameLoop);
-  </script>
+<script src="script.js"></script>
 
 </body>
 </html>
