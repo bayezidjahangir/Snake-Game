@@ -1,160 +1,176 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-const scoreEl = document.getElementById("score");
-const bestEl = document.getElementById("best");
-const overlay = document.getElementById("overlay");
+const grid = 20;
+const size = 400;
 
-const GRID = 20;
-const SIZE = 400;
-
-let snake, food, bonusFood;
-let direction, nextDirection;
+let snake, food, direction, nextDirection;
 let score = 0;
 let best = Number(localStorage.getItem("snakeBest")) || 0;
-let timer;
+let gameLoop = null;
 let running = false;
-let paused = false;
-let soundOn = true;
-let foodCount = 0;
-let bonusExpiry = 0;
+let gameOver = false;
 
-const colors = {
-    green: "#39ff88",
-    blue: "#32c8ff",
-    red: "#ff4565"
-};
+document.getElementById("best").textContent = best;
 
-let snakeColor = colors.green;
-
-bestEl.textContent = best;
-
-function resetGame() {
+function reset() {
     snake = [
         {x: 200, y: 200},
         {x: 180, y: 200},
         {x: 160, y: 200}
     ];
 
-    direction = {x: 20, y: 0};
-    nextDirection = {x: 20, y: 0};
-
+    direction = "RIGHT";
+    nextDirection = "RIGHT";
     score = 0;
-    foodCount = 0;
-    bonusFood = null;
+    gameOver = false;
 
-    scoreEl.textContent = score;
-    spawnFood();
+    document.getElementById("score").textContent = score;
+    createFood();
     draw();
 }
 
-function spawnFood() {
+function createFood() {
     do {
         food = {
-            x: Math.floor(Math.random() * 20) * GRID,
-            y: Math.floor(Math.random() * 20) * GRID
+            x: Math.floor(Math.random() * 20) * grid,
+            y: Math.floor(Math.random() * 20) * grid
         };
-    } while (snake.some(p => p.x === food.x && p.y === food.y));
+    } while (snake.some(s => s.x === food.x && s.y === food.y));
 }
 
-function spawnBonus() {
-    do {
-        bonusFood = {
-            x: Math.floor(Math.random() * 20) * GRID,
-            y: Math.floor(Math.random() * 20) * GRID
-        };
-    } while (
-        snake.some(p => p.x === bonusFood.x && p.y === bonusFood.y) ||
-        (bonusFood.x === food.x && bonusFood.y === food.y)
+function drawSnake() {
+    snake.forEach((part, i) => {
+        const isHead = i === 0;
+
+        const gradient = ctx.createLinearGradient(
+            part.x, part.y,
+            part.x + grid, part.y + grid
+        );
+
+        gradient.addColorStop(0, isHead ? "#b5ff8a" : "#65ed75");
+        gradient.addColorStop(0.5, "#20b957");
+        gradient.addColorStop(1, "#087b39");
+
+        ctx.fillStyle = gradient;
+        ctx.shadowColor = "#36ff70";
+        ctx.shadowBlur = 7;
+
+        ctx.beginPath();
+        ctx.roundRect(
+            part.x + 1,
+            part.y + 1,
+            grid - 2,
+            grid - 2,
+            isHead ? 9 : 8
+        );
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        if (isHead) {
+            drawEyes(part);
+        } else {
+            ctx.fillStyle = "#b4ffb0";
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.arc(part.x + 7, part.y + 6, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+    });
+}
+
+function drawEyes(head) {
+    ctx.fillStyle = "white";
+
+    let eyes;
+
+    if (direction === "RIGHT") {
+        eyes = [[14, 5], [14, 14]];
+    } else if (direction === "LEFT") {
+        eyes = [[5, 5], [5, 14]];
+    } else if (direction === "UP") {
+        eyes = [[5, 5], [14, 5]];
+    } else {
+        eyes = [[5, 14], [14, 14]];
+    }
+
+    eyes.forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(head.x + x, head.y + y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#102016";
+        ctx.beginPath();
+        ctx.arc(head.x + x, head.y + y, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "white";
+    });
+}
+
+function drawFood() {
+    const x = food.x + 10;
+    const y = food.y + 10;
+
+    ctx.shadowColor = "#ff3838";
+    ctx.shadowBlur = 12;
+
+    const g = ctx.createRadialGradient(
+        x - 4, y - 4, 1, x, y, 10
     );
 
-    bonusExpiry = Date.now() + 5000;
-}
+    g.addColorStop(0, "#ffaaaa");
+    g.addColorStop(0.5, "#ff3333");
+    g.addColorStop(1, "#a90000");
 
-function drawCell(x, y, color) {
-    ctx.fillStyle = color;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 10;
+    ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.roundRect(x + 2, y + 2, 16, 16, 5);
+    ctx.arc(x, y, 9, 0, Math.PI * 2);
     ctx.fill();
+
     ctx.shadowBlur = 0;
 }
 
 function draw() {
-    ctx.fillStyle = "#07110c";
-    ctx.fillRect(0, 0, SIZE, SIZE);
+    ctx.clearRect(0, 0, size, size);
 
-    ctx.strokeStyle = "#14271b";
-
-    for (let i = 0; i <= SIZE; i += GRID) {
+    ctx.strokeStyle = "#ffffff0b";
+    for (let i = 0; i <= size; i += grid) {
         ctx.beginPath();
         ctx.moveTo(i, 0);
-        ctx.lineTo(i, SIZE);
+        ctx.lineTo(i, size);
         ctx.stroke();
 
         ctx.beginPath();
         ctx.moveTo(0, i);
-        ctx.lineTo(SIZE, i);
+        ctx.lineTo(size, i);
         ctx.stroke();
     }
 
-    drawCell(food.x, food.y, "#ff5364");
-
-    if (bonusFood && Date.now() < bonusExpiry) {
-        drawCell(bonusFood.x, bonusFood.y, "#ffd447");
-    }
-
-    snake.forEach((p, i) => {
-        drawCell(p.x, p.y, i === 0 ? "#ffffff" : snakeColor);
-    });
-}
-
-function playSound(freq) {
-    if (!soundOn) return;
-
-    try {
-        const audio = new AudioContext();
-        const osc = audio.createOscillator();
-        const gain = audio.createGain();
-
-        osc.frequency.value = freq;
-        gain.gain.value = 0.04;
-
-        osc.connect(gain);
-        gain.connect(audio.destination);
-
-        osc.start();
-        osc.stop(audio.currentTime + 0.08);
-        osc.onended = () => audio.close();
-    } catch (e) {}
+    drawFood();
+    drawSnake();
 }
 
 function update() {
-    if (!running || paused) return;
-
     direction = nextDirection;
 
-    const head = {
-        x: snake[0].x + direction.x,
-        y: snake[0].y + direction.y
-    };
+    const head = {...snake[0]};
+
+    if (direction === "UP") head.y -= grid;
+    if (direction === "DOWN") head.y += grid;
+    if (direction === "LEFT") head.x -= grid;
+    if (direction === "RIGHT") head.x += grid;
 
     const eating = head.x === food.x && head.y === food.y;
-
-    const eatingBonus = bonusFood &&
-        Date.now() < bonusExpiry &&
-        head.x === bonusFood.x &&
-        head.y === bonusFood.y;
-
-    const body = eating || eatingBonus ? snake : snake.slice(0, -1);
+    const body = eating ? snake : snake.slice(0, -1);
 
     if (
-        head.x < 0 || head.x >= SIZE ||
-        head.y < 0 || head.y >= SIZE ||
+        head.x < 0 || head.x >= size ||
+        head.y < 0 || head.y >= size ||
         body.some(p => p.x === head.x && p.y === head.y)
     ) {
-        gameOver();
+        endGame();
         return;
     }
 
@@ -162,158 +178,80 @@ function update() {
 
     if (eating) {
         score += 10;
-        foodCount++;
-        playSound(550);
-        spawnFood();
+        document.getElementById("score").textContent = score;
 
-        if (foodCount % 5 === 0) spawnBonus();
+        if (score > best) {
+            best = score;
+            localStorage.setItem("snakeBest", best);
+            document.getElementById("best").textContent = best;
+        }
 
-    } else if (eatingBonus) {
-        score += 50;
-        bonusFood = null;
-        playSound(850);
+        createFood();
+
+        clearInterval(gameLoop);
+        gameLoop = setInterval(update, Math.max(65, 130 - score));
     } else {
         snake.pop();
-    }
-
-    if (bonusFood && Date.now() >= bonusExpiry) {
-        bonusFood = null;
-    }
-
-    scoreEl.textContent = score;
-
-    if (score > best) {
-        best = score;
-        bestEl.textContent = best;
-        localStorage.setItem("snakeBest", best);
     }
 
     draw();
 }
 
 function startGame() {
-    clearInterval(timer);
-    resetGame();
+    if (running || gameOver) return;
 
     running = true;
-    paused = false;
-
-    overlay.style.display = "none";
-    document.getElementById("pauseBtn").textContent = "PAUSE";
-
-    timer = setInterval(
-        update,
-        Number(document.getElementById("difficulty").value)
-    );
-}
-
-function gameOver() {
-    running = false;
-    clearInterval(timer);
-
-    document.getElementById("overlayTitle").textContent = "GAME OVER";
-    document.getElementById("overlayText").textContent =
-        "Your Score: " + score;
-
-    document.getElementById("startBtn").textContent = "PLAY AGAIN";
-    overlay.style.display = "flex";
-
-    playSound(180);
+    document.getElementById("message").textContent = "Game Running!";
+    gameLoop = setInterval(update, 130);
 }
 
 function pauseGame() {
     if (!running) return;
 
-    paused = !paused;
-
-    document.getElementById("pauseBtn").textContent =
-        paused ? "RESUME" : "PAUSE";
-
-    if (paused) {
-        document.getElementById("overlayTitle").textContent = "PAUSED";
-        document.getElementById("overlayText").textContent = "Take a break!";
-        document.getElementById("startBtn").textContent = "RESUME";
-        overlay.style.display = "flex";
-    } else {
-        overlay.style.display = "none";
-    }
+    clearInterval(gameLoop);
+    running = false;
+    document.getElementById("message").textContent = "Paused";
 }
 
-function changeDirection(dir) {
-    const directions = {
-        up: {x: 0, y: -20},
-        down: {x: 0, y: 20},
-        left: {x: -20, y: 0},
-        right: {x: 20, y: 0}
-    };
+function endGame() {
+    clearInterval(gameLoop);
+    running = false;
+    gameOver = true;
+    document.getElementById("message").textContent =
+        "Game Over! Score: " + score;
+}
 
-    const chosen = directions[dir];
-
-    if (!chosen || !running || paused) return;
-
-    if (
-        chosen.x === -direction.x &&
-        chosen.y === -direction.y
-    ) return;
-
-    nextDirection = chosen;
+function restartGame() {
+    clearInterval(gameLoop);
+    running = false;
+    reset();
+    document.getElementById("message").textContent =
+        "Press Start to Play";
 }
 
 document.addEventListener("keydown", e => {
-    const keys = {
-        ArrowUp: "up", w: "up", W: "up",
-        ArrowDown: "down", s: "down", S: "down",
-        ArrowLeft: "left", a: "left", A: "left",
-        ArrowRight: "right", d: "right", D: "right"
+    const key = e.key.toLowerCase();
+
+    const controls = {
+        arrowup: "UP", w: "UP",
+        arrowdown: "DOWN", s: "DOWN",
+        arrowleft: "LEFT", a: "LEFT",
+        arrowright: "RIGHT", d: "RIGHT"
     };
 
-    if (keys[e.key]) {
-        e.preventDefault();
-        changeDirection(keys[e.key]);
-    }
+    const newDir = controls[key];
+    if (!newDir) return;
 
-    if (e.code === "Space") {
-        e.preventDefault();
-        pauseGame();
+    e.preventDefault();
+
+    if (
+        (newDir === "UP" && direction !== "DOWN") ||
+        (newDir === "DOWN" && direction !== "UP") ||
+        (newDir === "LEFT" && direction !== "RIGHT") ||
+        (newDir === "RIGHT" && direction !== "LEFT")
+    ) {
+        nextDirection = newDir;
     }
 });
 
-document.querySelectorAll("[data-dir]").forEach(btn => {
-    btn.addEventListener("pointerdown", e => {
-        e.preventDefault();
-        changeDirection(btn.dataset.dir);
-    });
-});
-
-document.getElementById("startBtn").onclick = () => {
-    if (running && paused) {
-        paused = false;
-        overlay.style.display = "none";
-        document.getElementById("pauseBtn").textContent = "PAUSE";
-    } else {
-        startGame();
-    }
-};
-
-document.getElementById("pauseBtn").onclick = pauseGame;
-document.getElementById("restartBtn").onclick = startGame;
-
-document.getElementById("soundBtn").onclick = function() {
-    soundOn = !soundOn;
-    this.textContent = soundOn ? "SOUND: ON" : "SOUND: OFF";
-};
-
-document.getElementById("theme").onchange = e => {
-    snakeColor = colors[e.target.value];
-    draw();
-};
-
-document.getElementById("difficulty").onchange = () => {
-    if (running) {
-        clearInterval(timer);
-        timer = setInterval(update,
-            Number(document.getElementById("difficulty").value));
-    }
-};
-
-resetGame();
+reset();

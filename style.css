@@ -1,26 +1,75 @@
-.stats {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #101820;
+    color: white;
+    font-family: Arial, sans-serif;
     display: flex;
-    gap: 15px;
-    margin: 20px 0;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-.stat {
-    flex: 1;
-    padding: 15px;
-    background: #182720;
-    border: 1px solid #39ff88;
+.game-container {
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 450px;
+}
+
+h1 {
+    color: #62ff87;
+    margin-bottom: 20px;
+}
+
+.score-board {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 18px;
+}
+
+canvas {
+    width: 100%;
+    max-width: 400px;
+    background: #182b25;
+    border: 3px solid #62ff87;
     border-radius: 12px;
+    box-shadow: 0 0 20px #35ff7650;
 }
 
-.stat span {
-    color: #9aaea1;
-    font-size: 11px;
-    letter-spacing: 1px;
+.buttons {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
-.stat strong {
-    display: block;
-    color: #39ff88;
-    font-size: 28px;
-    margin-top: 6px;
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #62ff87;
+    color: #102016;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #38d963;
+}
+
+#message {
+    margin-top: 18px;
+    color: #62ff87;
+}
+
+.help {
+    margin-top: 10px;
+    color: #aaa;
+    font-size: 13px;
 }
